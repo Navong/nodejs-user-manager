@@ -11,13 +11,13 @@ app.use(express.json());
 //cors
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods','GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   next();
 });
 
 //test api
-app.get('/test', (req, res) => {
+app.get('/api/test', (req, res) => {
   try {
     res.status(200).json({ message: 'API is working lol' });
   } catch (error) {
@@ -26,7 +26,7 @@ app.get('/test', (req, res) => {
 });
 
 // Update user
-app.put('/users/:id', async (req, res) => {
+app.put('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email } = req.body;
@@ -44,7 +44,7 @@ app.put('/users/:id', async (req, res) => {
 });
 
 // Delete user
-app.delete('/users/:id', async (req, res) => {
+app.delete('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
     await prisma.user.delete({
@@ -58,7 +58,7 @@ app.delete('/users/:id', async (req, res) => {
 
 
 // Create user
-app.post('/users', async (req, res) => {
+app.post('/api/users', async (req, res) => {
   try {
     const { name, email } = req.body;
     const newUser = await prisma.user.create({
@@ -75,7 +75,7 @@ app.post('/users', async (req, res) => {
 
 
 // Get all users
-app.get('/users', async (req, res) => {
+app.get('/api/users', async (req, res) => {
   try {
     const users = await prisma.user.findMany();
     res.status(200).json(users);
@@ -85,7 +85,7 @@ app.get('/users', async (req, res) => {
 });
 
 // Get user by ID
-app.get('/users/:id', async (req, res) => {
+app.get('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const user = await prisma.user.findUnique({

@@ -8,12 +8,12 @@ services:
       context: ./frontend
       dockerfile: frontend.dockerfile
     ports:
-      - 3000:3000
+      - 3001:3000
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:4000
+      - BACKEND_URL=http://crud.navong.xyz/api
     restart: always
     labels:
-      - "traefik.http.routers.frontend.rule=Host(`app.localhost`)"
+      - "traefik.http.routers.frontend.rule=Host(`crud.navong.xyz`)"
     depends_on:
       - backend
       - traefik
@@ -28,7 +28,9 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/postgres?schema=public
     labels:
-      - "traefik.http.routers.backend.rule=(Host(`app.localhost`) && PathPrefix(`/test`))"
+      - "traefik.http.routers.backend.rule=(Host(`crud.navong.xyz`) && PathPrefix(`/api`))"
+      # - "traefik.http.routers.backend.middlewares=strip-prefix"
+      # - "traefik.http.middlewares.strip-prefix.stripprefix.prefixes=/api"
     depends_on:
       - traefik
       - db
@@ -44,6 +46,8 @@ services:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+    # labels:
+      # - "traefik.http.routers.frontend.rule=Host(`crud.navong.xyz`)"
   traefik:
     image: traefik:v2.9
     command: --api.insecure=true --providers.docker

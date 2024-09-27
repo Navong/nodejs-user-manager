@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import CardComponent from "../components/CardComponent";
 
+const url = "http://crud.navong.xyz/api";
+// const url = "http://server.navong.xyz:4000";
+
 interface User {
   id: number;
   name: string;
@@ -21,7 +24,7 @@ const Home: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://localhost:4000/users");
+      const response = await fetch(`${url}/users`);
       const data = await response.json();
       setUsers(data.reverse()); // Reverse the array to show newest users first
     } catch (error) {
@@ -47,7 +50,7 @@ const Home: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:4000/users/${editingUser.id}`,
+        `${url}/users/${editingUser.id}`,
         {
           method: "PUT",
           headers: {
@@ -70,7 +73,7 @@ const Home: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await fetch(`http://localhost:4000/users/${id}`, {
+      await fetch(`${url}/users/${id}`, {
         method: "DELETE",
       });
       fetchUsers(); // Refresh the user list
@@ -87,7 +90,7 @@ const Home: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:4000/users", {
+      const response = await fetch(`${url}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
