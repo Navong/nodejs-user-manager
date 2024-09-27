@@ -1,0 +1,21 @@
+@url = http://localhost:4000
+
+
+### Test endpoint
+GET {{url}}/test
+
+
+### Create user
+POST {{url}}/users
+Content-Type: application/json
+
+{
+    "name": "testuser",
+    "email": "testuser"
+}
+
+
+
+### Get all users
+GET {{url}}/users
+

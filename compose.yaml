@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  frontend:
+    container_name: frontend
+    image: frontend
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+    restart: always
+    labels:
+      - "traefik.http.routers.frontend.rule=Host(`app.localhost`)"
+    depends_on:
+      - backend
+      - traefik
+  backend:
+    container_name: backend
+    image: backend
+    build:
+      context: ./backend
+      dockerfile: backend.dockerfile
+    ports:
+      - 4000:4000
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/postgres?schema=public
+    labels:
+      - "traefik.http.routers.backend.rule=(Host(`app.localhost`) && PathPrefix(`/test`))"
+    depends_on:
+      - traefik
+      - db
+  db:
+    container_name: db
+    image: postgres:12
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  traefik:
+    image: traefik:v2.9
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+volumes:
+  pgdata:
