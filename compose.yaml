@@ -14,9 +14,13 @@ services:
     restart: always
     labels:
       - "traefik.http.routers.frontend.rule=Host(`crud.navong.xyz`)"
+      # - "traefik.http.services.frontend.loadbalancer.server.port=3000"
     depends_on:
       - backend
       - traefik
+    networks:
+      - traefik-network
+
   backend:
     container_name: backend
     image: backend
@@ -26,35 +30,47 @@ services:
     ports:
       - 4000:4000
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/postgres?schema=public
+      DATABASE_URL: postgresql://postgres:postgres@server.navong.xyz:5432/crud?schema=public
     labels:
       - "traefik.http.routers.backend.rule=(Host(`crud.navong.xyz`) && PathPrefix(`/api`))"
-      # - "traefik.http.routers.backend.middlewares=strip-prefix"
-      # - "traefik.http.middlewares.strip-prefix.stripprefix.prefixes=/api"
+      # - "traefik.http.services.backend.loadbalancer.server.port=4000"
     depends_on:
       - traefik
-      - db
-  db:
-    container_name: db
-    image: postgres:12
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    ports:
-      - 5432:5432
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    # labels:
-      # - "traefik.http.routers.frontend.rule=Host(`crud.navong.xyz`)"
+    networks:
+      - traefik-network
+
+  # db:
+  #   container_name: db
+  #   image: postgres:12
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: postgres
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   networks:
+  #     - traefik-network
+
   traefik:
-    image: traefik:v2.9
+    container_name: traefik
+    image: traefik:latest
     command: --api.insecure=true --providers.docker
     ports:
       - "80:80"
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik-network
+    restart: always
+
 volumes:
-  pgdata:
+  postgres_data:
+
+networks:
+  traefik-network:
+    external: true
+
