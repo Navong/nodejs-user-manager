@@ -30,7 +30,7 @@ services:
     ports:
       - 4000:4000
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@server.navong.xyz:5432/crud?schema=public
+      DATABASE_URL: ${DATABASE_URL}
     labels:
       - "traefik.http.routers.backend.rule=(Host(`crud.navong.xyz`) && PathPrefix(`/api`))"
       # - "traefik.http.services.backend.loadbalancer.server.port=4000"
